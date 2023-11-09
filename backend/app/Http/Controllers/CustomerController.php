@@ -15,12 +15,12 @@ class CustomerController extends Controller
     public function index()
     {
         try {
-            $customer = Customer::all();
-
-            if ($customer->count() > 0){
-                return response()->json($customer,200);
-            }else{
-                return response()->json("No customers found", 404);
+            $customers = Customer::all();
+           
+            if (count($customers) > 0) {
+                return response()->json($customers, 200);
+            } else {
+                return response()->json(['message' => 'No customers found'], 404);
             }
         } catch (\Throwable $error) {
             throw $error;
@@ -36,18 +36,24 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                "name" => "required",
-                "email" => "required|email",
-                "address" => "required",
-            ]);
-            $customer = new Customer();
-            $customer->name = $request->name;
-            $customer->email = $request->email;
-            $customer->address = $request->address;
-            $customer->save();
 
-            return response()->json($customer, 201);
+            $request->validate([
+                'name' =>'required',
+                'email' =>'required',
+                'address' =>'required',
+            ]);
+            
+            $customer = Customer::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'address' => $request->address,
+            ]);
+
+            if($customer){
+                return response()->json($customer, 201);
+            }else{
+                return response()->json("Failed to Add", 500);
+            }
         } catch (\Throwable $error) {
             throw $error;
         }
@@ -64,10 +70,10 @@ class CustomerController extends Controller
         try {
             $customer = Customer::find($id);
 
-            if ($customer){
+            if ($customer) {
                 return response()->json($customer, 200);
-            }else{
-                return response()->json("Customer not found", 404);
+            } else {
+                return response()->json(['message' => 'Customer not found'], 404);
             }
         } catch (\Throwable $error) {
             throw $error;
@@ -84,14 +90,25 @@ class CustomerController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $customer = Customer::find($id);
-            $customer->name = $request->name;
-            $customer->email = $request->email;
-            $customer->address = $request->address;
-            $customer->save();
+            $request->validate([
+                'name' =>'required',
+                'email' =>'required',
+                'address' =>'required',
+            ]);
 
-            return response()->json($customer, 200);
-        } catch (\Throwable $error) {
+            $customer = Customer::find($id);
+
+            if ($customer) {
+                $customer->name = $request->name;
+                $customer->email = $request->email;
+                $customer->address = $request->address;
+                $customer->save();
+
+                return response()->json($customer, 200);
+            } else {
+                return response()->json(['message' => 'Customer not found'], 404);
+            }
+        } catch (\Throwable $th) {
             throw $error;
         }
     }
@@ -106,11 +123,14 @@ class CustomerController extends Controller
     {
         try {
             $customer = Customer::find($id);
-            $customer->delete();
 
-            $updated_customer = Customer::all();
+            if ($customer) {
+                $customer->delete();
 
-            return response()->json($updated_customer, 200);
+                return response()->json(['message' => 'Customer deleted'], 200);
+            } else {
+                return response()->json(['message' => 'Customer not found'], 404);
+            }
         } catch (\Throwable $error) {
             throw $error;
         }
