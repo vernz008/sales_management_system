@@ -15,7 +15,6 @@ class ProductController extends Controller
     public function index()
     {
         try {
-
             $products = Product::with(["supplier","category"])->get();
             $mappedProducts = $products->map(function ($data) {
                 return [

@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Inventory;
 use App\Models\Product;
-use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 
@@ -19,25 +16,32 @@ class InventoryController extends Controller
     public function index()
     {
         try {
+            $products = Product::with('inventory', 'category', 'supplier')
+            ->join('inventories', 'products.id', '=', 'inventories.product_id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('suppliers', 'products.supplier_id', '=', 'suppliers.id')
+            ->select('products.id', 'products.name', 'products.description', 'products.price', 'inventories.stock', 'categories.name as category_name', 'suppliers.company_name as supplier_name')
+            ->get();
+    
+        return $products;
+            // $inventory = Inventory::all();
+            // $products = Product::with(["supplier","category"])->get();
 
-            $inventory = Inventory::all();
-            $products = Product::with(["supplier","category"])->get();
-
-            $mappedProducts = $products->map(function ($data) use ($inventory) {
-                $stock = $inventory->where('product_id', $data->id)->first();
+            // $mappedProducts = $products->map(function ($data) use ($inventory) {
+            //     $stock = $inventory->where('product_id', $data->id)->first();
         
-                return [
-                    'id' => $data->id,
-                    'product_name' => $data->name,
-                    'description' => $data->description,
-                    'price' => $data->price,
-                    "stock" => $stock ? $stock->stock : 0 ,
-                    'supplier' => $data->supplier->company_name,
-                    'category' => $data->category->name,
-                ];
-            });
+            //     return [
+            //         'id' => $data->id,
+            //         'product_name' => $data->name,
+            //         'description' => $data->description,
+            //         'price' => $data->price,
+            //         "stock" => $stock ? $stock->stock : 0 ,
+            //         'supplier' => $data->supplier->company_name,
+            //         'category' => $data->category->name,
+            //     ];
+            // });
         
-            return [$mappedProducts];
+            // return [$mappedProducts];
             
         } catch (\Exception $error) {
 

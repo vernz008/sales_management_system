@@ -4,15 +4,23 @@ import Home from "./pages/Home";
 import Customer from "./pages/Customer";
 import CreateCustomer from "./pages/CreateCustomer";
 import UpdateCustomer from "./pages/UpdateCustomer";
+import UpdateHome from "./pages/UpdateHome";
+import Category from "./pages/Category";
+import UpdateCategory from "./pages/UpdateCategory";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/update/:customer_id" element={<UpdateHome />} />
+
         <Route path="/customer" element={<Customer />} />
         <Route path="/create-customer" element={<CreateCustomer />} />
         <Route path="/update-customer/:id" element={<UpdateCustomer />} />
+
+        <Route path="/category" element={<Category />} />
+        <Route path="/update-category/:cat_id" element={<UpdateCategory />} />
       </Routes>
     </>
   );

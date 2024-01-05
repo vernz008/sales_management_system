@@ -14,17 +14,17 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        try {
-            $customers = Customer::all();
-           
-            if (count($customers) > 0) {
-                return response()->json($customers, 200);
-            } else {
-                return response()->json(['message' => 'No customers found'], 404);
-            }
-        } catch (\Throwable $error) {
-            throw $error;
+       try {
+        $customer = Customer::all();
+        
+        if (count($customer) > 0){
+            return response()->json($customer,200);
+        }else{
+            return response()->json(['message' => "Customer Table is Empty"],404);
         }
+       } catch (\Throwable $error) {
+        throw $error;
+       }
     }
 
     /**
@@ -50,7 +50,11 @@ class CustomerController extends Controller
             ]);
 
             if($customer){
-                return response()->json($customer, 201);
+
+                $customer_list = Customer::all();
+                
+                return response()->json($customer_list, 201);
+                
             }else{
                 return response()->json("Failed to Add", 500);
             }
@@ -71,6 +75,7 @@ class CustomerController extends Controller
             $customer = Customer::find($id);
 
             if ($customer) {
+
                 return response()->json($customer, 200);
             } else {
                 return response()->json(['message' => 'Customer not found'], 404);
@@ -104,7 +109,9 @@ class CustomerController extends Controller
                 $customer->address = $request->address;
                 $customer->save();
 
-                return response()->json($customer, 200);
+                $customer_update = Customer::find($id);
+
+                return response()->json($customer_update, 200);
             } else {
                 return response()->json(['message' => 'Customer not found'], 404);
             }
@@ -127,7 +134,9 @@ class CustomerController extends Controller
             if ($customer) {
                 $customer->delete();
 
-                return response()->json(['message' => 'Customer deleted'], 200);
+                $all_customer = Customer::all();
+
+                return response()->json($all_customer, 200);
             } else {
                 return response()->json(['message' => 'Customer not found'], 404);
             }

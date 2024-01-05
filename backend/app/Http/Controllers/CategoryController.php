@@ -18,7 +18,9 @@ class CategoryController extends Controller
             $categories = Category::all();
             
             if (count($categories) > 0) {
-                return response()->json($categories, 200);
+
+                $listofCategories = Category::all();
+                return response()->json($listofCategories, 200);
             } else {
                 return response()->json(['message' => 'No categories found'], 404);
             }
@@ -59,7 +61,17 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $category = Category::find($id);
+            if (!$category) {
+                return response()->json(['message' => 'Category not found'], 404);
+            }else{
+
+                return response()->json($category, 200);
+            }
+        } catch (\Throwable $error) {
+            throw $error;
+        }
     }
 
     /**
@@ -71,7 +83,26 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $request->validate([
+                'name' =>'required',
+            ]);
+
+            $category = Category::find($id);
+
+            if ($category) {
+                $category->name = $request->name;
+                $category->save();
+
+                $category_update = Category::find($id);
+
+                return response()->json($category_update, 200);
+            } else {
+                return response()->json(['message' => 'Category not found'], 404);
+            }
+        } catch (\Throwable $error) {
+            throw $error;
+        }
     }
 
     /**
@@ -82,6 +113,20 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $category = Category::find($id);
+
+            if ($category) {
+                $category->delete();
+
+                $all_category = Category::all();
+
+                return response()->json($all_category, 200);
+            } else {
+                return response()->json(['message' => 'Category not found'], 404);
+            }
+        } catch (\Throwable $error) {
+            throw $error;
+        }
     }
 }
